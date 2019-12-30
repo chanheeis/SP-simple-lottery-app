@@ -1,0 +1,13 @@
+#result-number-section p{
+    display: inline-block;
+    margin-right:30px;
+    font-weight: bold;
+}
+
+.detail-list{
+    margin-bottom: 20px;    
+}
+
+.detail-list span{
+    margin-right:20px;
+}

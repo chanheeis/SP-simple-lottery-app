@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="lotteryProject.css">
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lottery Program</title>
+</head>
+<body>
+    <script>
+        let winningNum=[];
+        let autoNumList=[];
+        let checkResult={};
+        
+        let detail_toggle=false;
+        let check_toggle=false;
+
+        $(document).ready(function(){
+            createWinningNum();
+            $('#set-btn').click(function(){
+                createWinningNum();
+            })
+            $('#auto-btn').click(function(){
+                createAutoNum();
+            })
+            $('#detail-btn').click(function(){
+                handleDetailView();
+            })
+            $('#check-btn').click(function(){
+                checkNumber();
+            })
+        })
+
+        function createAutoNum(){
+            autoNumList=[];
+            let autoNum=[];
+            for(let i=0;i<2000;i++){
+                for(let j=0;j<6;j++){
+                    let num=getRandomInt(autoNum);
+                    autoNum.push(num);
+                }   
+                autoNumList.push(autoNum);
+                autoNum=[];        
+            }
+            createDetail();
+        }
+
+        function handleDetailView(){
+            if(detail_toggle===true){
+                $('#detail-section').hide('slow');
+                detail_toggle=false;
+            }else{
+                $('#detail-section').show('slow');
+                detail_toggle=true;
+            }
+        }
+        
+        function handleCheckResult(){
+            if(check_toggle===true){
+                showResult();
+            }else{
+                resetResult();
+            }    
+        }
+
+        function createDetail(){
+            const rootDiv=$('#detail-section');
+            rootDiv.empty();
+            for(let i=0;i<10;i++){
+                var div=document.createElement('DIV');
+                var hr=document.createElement('HR');
+                
+                div.className="detail-list"
+                for(let j=0;j<6;j++){
+                    var span=document.createElement('SPAN');
+                    span.innerHTML=autoNumList[i][j];
+                    div.appendChild(span);
+                }
+                rootDiv.hide();
+                rootDiv.append(div);
+                rootDiv.append(hr);
+            }
+            
+            rootDiv.show('slow');
+            detail_toggle=true;
+        }
+
+        function getRandomInt(arr){
+            let num=Math.ceil(Math.random()*(10));
+            if(arr.length>0){
+                for(let i=0;i<arr.length;i++){
+                    if(arr[i]===num){
+                        num=Math.ceil(Math.random()*(10));
+                        i--;
+                    }
+                }
+            }
+            return num;
+        }
+
+        function createWinningNum(){
+            winningNum=[];
+            autoNumList=[];
+
+            check_toggle=false;
+
+            handleDetailView();
+            handleCheckResult();
+
+            //Code Refactoring 필요한 부분
+            const rootDiv=$('#detail-section');
+            rootDiv.empty();
+
+            for(var i=0;i<6;i++){
+                var num=getRandomInt(winningNum);
+                winningNum.push(num);
+            }
+            for(let i=0;i<6;i++){
+                $("#winning-num-"+i).html(winningNum[i]);
+            }
+        }
+
+        function checkNumber(){
+            let count=0;
+
+            autoNumList=autoNumList.filter(autoNum=>{
+                return compareArr(autoNum,winningNum)>3
+            });
+
+            const rootDiv=$('#detail-section');
+            rootDiv.empty();
+
+            autoNumList.forEach(autoNum=>{
+                const div=document.createElement('DIV');
+                const hr=document.createElement('HR');
+                
+                div.className="detail-list"
+                for(let i=0;i<6;i++){
+                    const span=document.createElement('SPAN');
+                    span.innerHTML=autoNum[i];
+                    div.appendChild(span);
+                }
+                rootDiv.hide();
+                rootDiv.append(div);
+                rootDiv.append(hr);
+            })
+
+            rootDiv.show('slow');
+            detail_toggle=true;
+
+            showResult();
+        }
+
+        function compareArr(arr1,arr2){
+            let count=0;
+            for(let i=0;i<6;i++){
+                if(arr1[i]===arr2[i]) count++;
+            }
+            return count;
+        }
+
+        //로또 당첨 결과를 보여주는 메서드
+        function showResult(){
+            const rootDiv=$('#result-text-section')
+            const p=$('#check-result');
+            p.hide();
+            p.html(`2000개 중 ${autoNumList.length}개에 해당하는 로또가 당첨되었습니다.`);
+            p.show('slow');
+        }
+
+        function resetResult(){
+            const p=$('#check-result');
+            p.hide('slow').html('');
+        }
+
+    </script>
+    <h1>Lottery Program</h1>
+    <div id="result-number-section">
+        <p id="winning-num-0"></p>
+        <p id="winning-num-1"></p>
+        <p id="winning-num-2"></p>
+        <p id="winning-num-3"></p>
+        <p id="winning-num-4"></p>
+        <p id="winning-num-5"></p>    
+    </div>
+
+    <button id="auto-btn">Auto-Number</button>
+    <div id="result-text-section">
+        <h3>Check Result</h3>
+        <p id="check-result"></p>
+    </div>
+    <button id="set-btn">Set Winning Number</button>
+    <button id="check-btn">Check Result</button>
+    <button id="detail-btn">Detail View</button><br>
+    <div id="detail-section"></div>
+    
+</body>
+</html>
